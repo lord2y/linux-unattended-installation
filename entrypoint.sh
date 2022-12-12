@@ -21,6 +21,9 @@ mkdir -p "$_SOURCE/server"
 #Move directory [BOOT] up
 mv "$_SOURCE"/'[BOOT]' ../BOOT
 
+#Copy files
+cp -v autoinstall/grub/grub.cfg "$_SOURCE"/boot/grub/grub.cfg
+cp -v autoinstall/server/* "$_SOURCE"/server
 
 "$BIN_XORRISO" -as mkisofs -r \
   -V 'Ubuntu 22.04 LTS AUTO (EFIBIOS)' \
