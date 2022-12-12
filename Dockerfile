@@ -1,7 +1,6 @@
 FROM ubuntu:22.04
 
-RUN apt-get update && apt-get install -y xorriso p7zip-full wget \
-  && mkdir -p autoinstall/{grub,nocloud}
+RUN apt-get update && apt-get install -y xorriso p7zip-full wget
 
 COPY grub.cfg autoinstall/grub/grub.cfg
 COPY meta-data autoinstall/server/meta-data
