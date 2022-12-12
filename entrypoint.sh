@@ -12,8 +12,10 @@ _OUTPUT="/output"
 # Create the DIR source-files
 mkdir -p "$_SOURCE/server"
 
-# Download the ISO
-"$BIN_WGET" "$_SOURCE_ISO_URL"
+if [ ! -f "$_ISO" ];then
+	# Download the ISO
+	"$BIN_WGET" "$_SOURCE_ISO_URL"
+fi
 
 # Explode the ISO
 "$BIN_7Z" -y x "$_ISO" -o"$_SOURCE"
@@ -25,6 +27,7 @@ mv "$_SOURCE"/'[BOOT]' ../BOOT
 cp -v autoinstall/grub/grub.cfg "$_SOURCE"/boot/grub/grub.cfg
 cp -v autoinstall/server/* "$_SOURCE"/server
 
+cd "$_SOURCE"
 "$BIN_XORRISO" -as mkisofs -r \
   -V 'Ubuntu 22.04 LTS AUTO (EFIBIOS)' \
   -o ../ubuntu-22.04-autoinstall.iso \
