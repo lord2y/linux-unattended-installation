@@ -15,37 +15,101 @@ autoinstall:
     primary:
       - arches: [default]
         uri: http://ch.archive.ubuntu.com/ubuntu
+
   storage:
     config:
       - id: disk0
-        type: disk
-        path: /dev/sda
-        grub_device: true
-        wipe: superblock
-      - id: disk1
-        type: disk
-        path: /dev/sdb
-        grub_device: true
-        wipe: superblock
-      - id: raid0
-        type: raid
-        name: md127
-        raidlevel: 1
-        devices: [disk0, disk1]
         ptable: gpt
+        path: /dev/sda
+        wipe: superblock-recursive
+        preserve: false
+        grub_device: false
+        type: disk
+      - id: disk1
+        ptable: gpt
+        path: /dev/sdb
+        wipe: superblock-recursive
+        preserve: false
+        grub_device: false
+        type: disk
+      - device: disk0
+        size: 2GB
         wipe: superblock
-      - id: part0
+        flag: boot
+        number: 1
+        preserve: false
+        grub_device: true
         type: partition
-        device: raid0
-        size: 20GB
-      - id: fs0
+        id: disk0-partition0
+      - fstype: fat32
+        volume: disk0-partition0
+        preserve: false
         type: format
-        fstype: ext4
-        volume: part0 
-      - id: rootfs
+        id: disk0-format0
+      - device: disk1
+        size: 2GB
+        wipe: superblock
+        flag: boot
+        number: 1
+        preserve: false
+        grub_device: true
+        type: partition
+        id: disk1-partition0
+      - fstype: fat32
+        volume: disk1-partition0
+        preserve: false
+        type: format
+        id: disk1-format0
+      - device: disk0
+        size: 17GB
+        wipe: superblock
+        number: 2
+        preserve: false
+        grub_device: false
+        type: partition
+        partition: disk0-partition1
+      - device: disk1
+        size: 17GB
+        wipe: superblock
+        number: 2
+        preserve: false
+        grub_device: false
+        type: partition
+        partition: disk1-partition1
+      - name: md0
+        raidlevel: 1
+        devices: [ disk0-partition0, disk1-partition0 ]
+        spare_devices: []
+        preserve: false
+        wipe: superblock
+        type: raid
+        id: raid0
+      - name: md1
+        raidlevel: 1
+        devices: [ disk0-partition1, disk1-partition1 ]
+        spare_devices: []
+        preserve: false
+        wipe: superblock
+        type: raid
+        id: raid1
+      - fstype: ext4
+        volume: raid0
+        preserve: false
+        type: format
+        id: format-raid0
+      - fstype: ext4
+        volume: raid1
+        preserve: false
+        type: format
+        id: format-raid1
+      - path: /
+        device: format-raid1
         type: mount
-        device: fs0
-        path: /
+        id: mount-root
+      - path: /boot
+        device: format-raid0
+        type: mount
+        id: mount-boot
       version: 1
   late-commands:
   - 'echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /target/etc/sudoers.d/ubuntu'
