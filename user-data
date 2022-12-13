@@ -11,28 +11,23 @@ autoinstall:
   ssh:
     allow-pw: false
     install-server: true
-  apt:
-    primary:
-      - arches: [default]
-        uri: http://ch.archive.ubuntu.com/ubuntu
-
   storage:
     config:
-      - id: disk0
+      - id: sda
         ptable: gpt
         path: /dev/sda
         wipe: superblock-recursive
         preserve: false
         grub_device: false
         type: disk
-      - id: disk1
+      - id: sdb
         ptable: gpt
         path: /dev/sdb
         wipe: superblock-recursive
         preserve: false
         grub_device: false
         type: disk
-      - device: disk0
+      - device: sda
         size: 2GB
         wipe: superblock
         flag: boot
@@ -40,13 +35,13 @@ autoinstall:
         preserve: false
         grub_device: true
         type: partition
-        id: disk0-partition0
+        id: sda-partition0
       - fstype: fat32
-        volume: disk0-partition0
+        volume: sda-partition0
         preserve: false
         type: format
-        id: disk0-format0
-      - device: disk1
+        id: sda-format0
+      - device: sdb
         size: 2GB
         wipe: superblock
         flag: boot
@@ -54,31 +49,31 @@ autoinstall:
         preserve: false
         grub_device: true
         type: partition
-        id: disk1-partition0
+        id: sdb-partition0
       - fstype: fat32
-        volume: disk1-partition0
+        volume: sdb-partition0
         preserve: false
         type: format
-        id: disk1-format0
-      - device: disk0
+        id: sdb-format0
+      - device: sda
         size: 17GB
         wipe: superblock
         number: 2
         preserve: false
         grub_device: false
         type: partition
-        partition: disk0-partition1
-      - device: disk1
+        partition: sda-partition1
+      - device: sdb
         size: 17GB
         wipe: superblock
         number: 2
         preserve: false
         grub_device: false
         type: partition
-        partition: disk1-partition1
+        partition: sdb-partition1
       - name: md0
         raidlevel: 1
-        devices: [ disk0-partition0, disk1-partition0 ]
+        devices: [ sda-partition0, sdb-partition0 ]
         spare_devices: []
         preserve: false
         wipe: superblock
@@ -86,7 +81,7 @@ autoinstall:
         id: raid0
       - name: md1
         raidlevel: 1
-        devices: [ disk0-partition1, disk1-partition1 ]
+        devices: [ sda-partition1, sdb-partition1 ]
         spare_devices: []
         preserve: false
         wipe: superblock
