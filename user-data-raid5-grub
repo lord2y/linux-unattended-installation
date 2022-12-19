@@ -1,0 +1,240 @@
+#cloud-config
+autoinstall:
+  apt:
+    disable_components: []
+    geoip: false
+    preserve_sources_list: false
+    primary:
+    - arches:
+      - amd64
+      - i386
+      uri: http://ch.archive.ubuntu.com/ubuntu
+    - arches:
+      - default
+      uri: http://ports.ubuntu.com/ubuntu-ports
+  drivers:
+    install: false
+  identity:
+    hostname: raid5
+    password: $6$lKcva4t.TP.1cnZt$B.ZsuZJ2.xr1riFvkzFmIL01B9GsaG2cEC0RRYfAUxLm9xPP14WuU/M552buzQrnSFUwWQdz4PQDlmVk33lBy1
+    realname: Ubuntu user
+    username: ubuntu
+  kernel:
+    package: linux-generic
+  keyboard:
+    layout: us
+    toggle: null
+    variant: ''
+  locale: en_US.UTF-8
+  network:
+    ethernets:
+      eth0:
+        dhcp4: true
+    version: 2
+  source:
+    id: ubuntu-server
+    search_drivers: true
+  ssh:
+    allow-pw: false
+    authorized-keys: []
+    install-server: true
+  storage:
+    config:
+    - ptable: gpt
+      path: /dev/vda
+      preserve: false
+      name: ''
+      grub_device: false
+      type: disk
+      id: disk-vda
+    - ptable: gpt
+      path: /dev/vdb
+      preserve: false
+      name: ''
+      grub_device: false
+      type: disk
+      id: disk-vdb
+    - ptable: gpt
+      path: /dev/vdc
+      preserve: false
+      name: ''
+      grub_device: false
+      type: disk
+      id: disk-vdc
+    - ptable: gpt
+      path: /dev/vdd
+      preserve: false
+      name: ''
+      grub_device: false
+      type: disk
+      id: disk-vdd
+    - ptable: gpt
+      path: /dev/vde
+      preserve: false
+      name: ''
+      grub_device: false
+      type: disk
+      id: disk-vde
+    - device: disk-vda
+      size: 564133888
+      wipe: superblock
+      flag: boot
+      number: 1
+      preserve: false
+      grub_device: true
+      offset: 1048576
+      type: partition
+      id: partition-0
+    - fstype: fat32
+      volume: partition-0
+      preserve: false
+      type: format
+      id: format-0
+    - device: disk-vdb
+      size: 564133888
+      wipe: superblock
+      flag: boot
+      number: 1
+      preserve: false
+      grub_device: true
+      offset: 1048576
+      type: partition
+      id: partition-1
+    - fstype: fat32
+      volume: partition-1
+      preserve: false
+      type: format
+      id: format-1
+    - device: disk-vdc
+      size: 564133888
+      wipe: superblock
+      flag: boot
+      number: 1
+      preserve: false
+      grub_device: true
+      offset: 1048576
+      type: partition
+      id: partition-2
+    - fstype: fat32
+      volume: partition-2
+      preserve: false
+      type: format
+      id: format-2
+    - device: disk-vdd
+      size: 564133888
+      wipe: superblock
+      flag: boot
+      number: 1
+      preserve: false
+      grub_device: true
+      offset: 1048576
+      type: partition
+      id: partition-3
+    - fstype: fat32
+      volume: partition-3
+      preserve: false
+      type: format
+      id: format-3
+    - device: disk-vde
+      size: 564133888
+      wipe: superblock
+      flag: boot
+      number: 1
+      preserve: false
+      grub_device: true
+      offset: 1048576
+      type: partition
+      id: partition-4
+    - fstype: fat32
+      volume: partition-4
+      preserve: false
+      type: format
+      id: format-4
+    - device: disk-vda
+      size: 8023703552
+      wipe: superblock
+      number: 2
+      preserve: false
+      grub_device: false
+      offset: 565182464
+      type: partition
+      id: partition-5
+    - device: disk-vdb
+      size: 8023703552
+      wipe: superblock
+      number: 2
+      preserve: false
+      grub_device: false
+      offset: 565182464
+      type: partition
+      id: partition-6
+    - device: disk-vdc
+      size: 8023703552
+      wipe: superblock
+      number: 2
+      preserve: false
+      grub_device: false
+      offset: 565182464
+      type: partition
+      id: partition-7
+    - device: disk-vdd
+      size: 8023703552
+      wipe: superblock
+      number: 2
+      preserve: false
+      grub_device: false
+      offset: 565182464
+      type: partition
+      id: partition-8
+    - device: disk-vde
+      size: 8023703552
+      wipe: superblock
+      number: 2
+      preserve: false
+      grub_device: false
+      offset: 565182464
+      type: partition
+      id: partition-9
+    - name: md127
+      raidlevel: raid5
+      devices:
+      - partition-5
+      - partition-6
+      - partition-7
+      - partition-8
+      - partition-9
+      spare_devices: []
+      preserve: false
+      wipe: superblock-recursive
+      ptable: gpt
+      type: raid
+      id: raid-0
+    - device: raid-0
+      size: 32071745536
+      wipe: superblock
+      number: 1
+      preserve: false
+      grub_device: false
+      offset: 1048576
+      type: partition
+      id: partition-10
+    - fstype: ext4
+      volume: partition-10
+      preserve: false
+      type: format
+      id: format-5
+    - path: /
+      device: format-5
+      type: mount
+      id: mount-1
+    - path: /boot/efi
+      device: format-0
+      type: mount
+      id: mount-0
+  updates: security
+  late-commands:
+  - 'echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /target/etc/sudoers.d/ubuntu'
+  - chmod 440 /target/etc/sudoers.d/ubuntu
+  - curtin in-target --target=/target -- sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="[^"]*/& net.ifnames=0/' /etc/default/grub
+  - curtin in-target --target=/target -- update-grub2
+  version: 1
