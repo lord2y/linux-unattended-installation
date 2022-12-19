@@ -13,99 +13,49 @@ autoinstall:
     install-server: true
   storage:
     config:
-      - id: sda
-        ptable: gpt
-        path: /dev/sda
-        wipe: superblock-recursive
-        preserve: false
-        grub_device: false
-        type: disk
-      - id: sdb
-        ptable: gpt
-        path: /dev/sdb
-        wipe: superblock-recursive
-        preserve: false
-        grub_device: false
-        type: disk
-      - device: sda
-        size: 2GB
-        wipe: superblock
-        flag: boot
-        number: 1
-        preserve: false
-        grub_device: true
-        type: partition
-        id: sda-partition0
-      - fstype: fat32
-        volume: sda-partition0
-        preserve: false
-        type: format
-        id: sda-format0
-      - device: sdb
-        size: 2GB
-        wipe: superblock
-        flag: boot
-        number: 1
-        preserve: false
-        grub_device: true
-        type: partition
-        id: sdb-partition0
-      - fstype: fat32
-        volume: sdb-partition0
-        preserve: false
-        type: format
-        id: sdb-format0
-      - device: sda
-        size: 17GB
-        wipe: superblock
-        number: 2
-        preserve: false
-        grub_device: false
-        type: partition
-        partition: sda-partition1
-      - device: sdb
-        size: 17GB
-        wipe: superblock
-        number: 2
-        preserve: false
-        grub_device: false
-        type: partition
-        partition: sdb-partition1
-      - name: md0
-        raidlevel: 1
-        devices: [ sda-partition0, sdb-partition0 ]
-        spare_devices: []
-        preserve: false
-        wipe: superblock
-        type: raid
-        id: raid0
-      - name: md1
-        raidlevel: 1
-        devices: [ sda-partition1, sdb-partition1 ]
-        spare_devices: []
-        preserve: false
-        wipe: superblock
-        type: raid
-        id: raid1
-      - fstype: ext4
-        volume: raid0
-        preserve: false
-        type: format
-        id: format-raid0
-      - fstype: ext4
-        volume: raid1
-        preserve: false
-        type: format
-        id: format-raid1
-      - path: /
-        device: format-raid1
-        type: mount
-        id: mount-root
-      - path: /boot
-        device: format-raid0
-        type: mount
-        id: mount-boot
-      version: 1
+    - type: disk
+      id: disk-0
+      ptable: gpt
+      path: /dev/vda
+      wipe: superblock
+      grub_device: true
+    - type: disk
+      id: disk-1
+      path: /dev/vdb
+      wipe: superblock
+    - id: raid-0
+      type: raid
+      name: md0
+      raidlevel: 1
+      devices: [disk-2, disk-1]
+      ptable: gpt
+      grub_device: true
+    - type: partition
+      id: part-1
+      device: raid-0
+      size: 512M
+      flag: bios_grub
+    - type: partition
+      id: part-2
+      device: raid-0
+      size: 8G
+    - type: format
+      id: fs-0
+      fstype: fat32
+      volume: part-1
+    - type: format
+      id: fs-1
+      fstype: ext4
+      volume: part-2
+    - type: mount
+      id: mount-0
+      device: fs-0
+      path: /boot/efi
+    - type: mount
+      id: mount-1
+      device: fs-1
+      path: /
+    version: 1
   late-commands:
   - 'echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /target/etc/sudoers.d/ubuntu'
   - chmod 440 /target/etc/sudoers.d/ubuntu
