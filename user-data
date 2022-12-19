@@ -1,140 +1,134 @@
 #cloud-config
 autoinstall:
+  apt:
+    disable_components: []
+    geoip: true
+    preserve_sources_list: false
+    primary:
+    - arches:
+      - amd64
+      - i386
+      uri: http://ch.archive.ubuntu.com/ubuntu
+    - arches:
+      - default
+      uri: http://ports.ubuntu.com/ubuntu-ports
+  drivers:
+    install: false
   identity:
     hostname: jammy-server-raid
     password: $6$lKcva4t.TP.1cnZt$B.ZsuZJ2.xr1riFvkzFmIL01B9GsaG2cEC0RRYfAUxLm9xPP14WuU/M552buzQrnSFUwWQdz4PQDlmVk33lBy1
     realname: Ubuntu user
     username: ubuntu
+  kernel:
+    package: linux-generic
   keyboard:
     layout: us
+    toggle: null
+    variant: ''
   locale: en_US.UTF-8
+  network:
+    ethernets:
+      eth0:
+        dhcp4: true
+    version: 2
+  source:
+    id: ubuntu-server
+    search_drivers: true
   ssh:
     allow-pw: false
+    authorized-keys: []
     install-server: true
   storage:
     config:
-    - grub_device: true
-      id: vda
-      name: vda
-      ptable: msdos
+    - ptable: gpt
+      path: /dev/vda
+      preserve: false
+      name: ''
+      grub_device: false
       type: disk
+      id: disk-vda
+    - ptable: gpt
+      path: /dev/vdb
+      preserve: false
+      name: ''
+      grub_device: false
+      type: disk
+      id: disk-vdb
+    - device: disk-vda
+      size: 564133888
       wipe: superblock
-      serial: disk-a
-      name: main_disk
-    - grub_device: true
-      id: vdb
-      name: vdb
+      flag: boot
+      number: 1
+      preserve: false
+      grub_device: true
+      type: partition
+      id: partition-0
+    - fstype: fat32
+      volume: partition-0
+      preserve: false
+      type: format
+      id: format-0
+    - device: disk-vdb
+      size: 564133888
+      wipe: superblock
+      flag: boot
+      number: 1
+      preserve: false
+      grub_device: true
+      type: partition
+      id: partition-1
+    - fstype: fat32
+      volume: partition-1
+      preserve: false
+      type: format
+      id: format-1
+    - device: disk-vda
+      size: 8023703552
+      wipe: superblock
+      number: 2
+      preserve: false
+      grub_device: false
+      type: partition
+      id: partition-2
+    - device: disk-vdb
+      size: 8023703552
+      wipe: superblock
+      number: 2
+      preserve: false
+      grub_device: false
+      type: partition
+      id: partition-3
+    - name: md0
+      raidlevel: raid1
+      devices:
+      - partition-2
+      - partition-3
+      spare_devices: []
+      preserve: false
+      wipe: superblock-recursive
       ptable: gpt
-      type: disk
-      wipe: superblock
-      serial: disk-b
-      name: second_disk
-    - device: vda
-      flag: boot
-      id: vda-part1
-      name: vda-part1
-      number: 1
-      size: 511705088B
-      type: partition
-      uuid: fc7ab24c-b6bf-460f-8446-d3ac362c0625
-      wipe: superblock
-    - device: vda
-      id: vda-part2
-      name: vda-part2
-      number: 2
-      size: 3G
-      type: partition
-      uuid: 47c97eae-f35d-473f-8f3d-d64161d571f1
-      wipe: superblock
-    - device: vda
-      id: vda-part3
-      name: vda-part3
-      number: 3
-      size: 1G
-      type: partition
-      uuid: e3202633-841c-4936-a520-b18d1f7938ea
-      wipe: superblock
-    - device: vdb
-      flag: boot
-      id: vdb-part1
-      name: vdb-part1
-      number: 1
-      size: 511705088B
-      type: partition
-      uuid: 86326392-3706-4124-87c6-2992acfa31cc
-      wipe: superblock
-    - device: vdb
-      id: vdb-part2
-      name: vdb-part2
-      number: 2
-      size: 3G
-      type: partition
-      uuid: a33a83dd-d1bf-4940-bf3e-6d931de85dbc
-      wipe: superblock
-    - devices:
-      - vda-part2
-      - vdb-part2
-      id: md0
-      name: md0
-      raidlevel: 1
-      spare_devices: []
       type: raid
-    - device: vdb
-      id: vdb-part3
-      name: vdb-part3
-      number: 3
-      size: 1G
-      type: partition
-      uuid: 27e29758-fdcf-4c6a-8578-c92f907a8a9d
+      id: raid-0
+    - device: raid-0
+      size: 8016363520
       wipe: superblock
-    - devices:
-      - vda-part3
-      - vdb-part3
-      id: md1
-      name: md1
-      raidlevel: 1
-      spare_devices: []
-      type: raid
-    - fstype: fat32
-      id: vda-part1_format
-      label: efi
-      type: format
-      uuid: b3d50fc7-2f9e-4d1a-9e24-28985e4c560b
-      volume: vda-part1
-    - fstype: fat32
-      id: vdb-part1_format
-      label: efi
-      type: format
-      uuid: c604cbb1-2ee1-4575-9489-d38a60fa0cf2
-      volume: vdb-part1
+      number: 1
+      preserve: false
+      grub_device: false
+      type: partition
+      id: partition-4
     - fstype: ext4
-      id: md0_format
-      label: ''
+      volume: partition-4
+      preserve: false
       type: format
-      uuid: 76a315b7-2979-436c-b156-9ae64a565a59
-      volume: md0
-    - fstype: ext4
-      id: md1_format
-      label: ''
-      type: format
-      uuid: 48dceca6-a9f9-4c7b-bfd3-7f3a0faa4ecc
-      volume: md1
-    - device: md0_format
-      id: md0_mount
-      options: ''
-      path: /
+      id: format-2
+    - path: /
+      device: format-2
       type: mount
-    - device: vda-part1_format
-      id: vda-part1_mount
-      options: ''
-      path: /boot/efi
+      id: mount-1
+    - path: /boot/efi
+      device: format-0
       type: mount
-    - device: md1_format
-      id: md1_mount
-      options: ''
-      path: /var
-      type: mount
-  late-commands:
-  - 'echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /target/etc/sudoers.d/ubuntu'
-  - chmod 440 /target/etc/sudoers.d/ubuntu
+      id: mount-0
+  updates: security
   version: 1
