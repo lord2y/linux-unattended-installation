@@ -15,7 +15,7 @@ autoinstall:
   drivers:
     install: false
   identity:
-    hostname: jammy-server-raid
+    hostname: raid1
     password: $6$lKcva4t.TP.1cnZt$B.ZsuZJ2.xr1riFvkzFmIL01B9GsaG2cEC0RRYfAUxLm9xPP14WuU/M552buzQrnSFUwWQdz4PQDlmVk33lBy1
     realname: Ubuntu user
     username: ubuntu
@@ -41,14 +41,12 @@ autoinstall:
   storage:
     config:
     - ptable: gpt
-      path: /dev/vda
       preserve: false
       name: ''
       grub_device: false
       type: disk
       id: disk-vda
     - ptable: gpt
-      path: /dev/vdb
       preserve: false
       name: ''
       grub_device: false
@@ -98,7 +96,7 @@ autoinstall:
       grub_device: false
       type: partition
       id: partition-3
-    - name: md0
+    - name: md127
       raidlevel: raid1
       devices:
       - partition-2
@@ -131,4 +129,9 @@ autoinstall:
       type: mount
       id: mount-0
   updates: security
+  late-commands:
+  - 'echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /target/etc/sudoers.d/ubuntu'
+  - chmod 440 /target/etc/sudoers.d/ubuntu
+  - curtin in-target --target=/target -- sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="[^"]*/& net.ifnames=0/' /etc/default/grub
+  - curtin in-target --target=/target -- update-grub2
   version: 1
