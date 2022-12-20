@@ -10,7 +10,7 @@ _SOURCE="source-files"
 _OUTPUT="/output"
 
 # Create the DIR source-files
-mkdir -p "$_SOURCE/server"
+mkdir -p "$_SOURCE"/{bastion,dhcp,vpn}
 
 if [ ! -f "$_ISO" ];then
 	# Download the ISO
@@ -25,7 +25,7 @@ mv "$_SOURCE"/'[BOOT]' ../BOOT
 
 #Copy files
 cp -v autoinstall/grub/grub.cfg "$_SOURCE"/boot/grub/grub.cfg
-cp -v autoinstall/server/* "$_SOURCE"/server
+cp -v autoinstall/*/* "$_SOURCE"
 
 cd "$_SOURCE"
 "$BIN_XORRISO" -as mkisofs -r \
