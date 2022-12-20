@@ -8,6 +8,7 @@ _ISO="jammy-live-server-amd64.iso"
 _SOURCE_ISO_URL="https://cdimage.ubuntu.com/ubuntu-server/jammy/daily-live/current/$_ISO"
 _SOURCE="source-files"
 _OUTPUT="/output"
+_PROFILES=(bastion dhcp vpn)
 
 # Create the DIR source-files
 mkdir -p "$_SOURCE"/{bastion,dhcp,vpn}
@@ -25,8 +26,11 @@ mv "$_SOURCE"/'[BOOT]' ../BOOT
 
 #Copy files
 cp -v autoinstall/grub/grub.cfg "$_SOURCE"/boot/grub/grub.cfg
-cp -v autoinstall/*/* "$_SOURCE"
+for profile in "${_PROFILES[@]}";
+do
+	cp -v autoinstall/"$profile"/* "$_SOURCE/$profile"
 
+done
 cd "$_SOURCE"
 "$BIN_XORRISO" -as mkisofs -r \
   -V 'Ubuntu 22.04 LTS AUTO (EFIBIOS)' \
