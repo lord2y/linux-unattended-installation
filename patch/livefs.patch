@@ -1,0 +1,40 @@
+diff --git a/livefs_edit/actions.py b/livefs_edit/actions.py
+index c4cbbf9..f456649 100644
+--- a/livefs_edit/actions.py
++++ b/livefs_edit/actions.py
+@@ -351,7 +351,7 @@ Expire-Date: 0
+         ['gpg', '--home', gpghome, '--gen-key', '--batch'],
+         stdin=gpgconfp)
+ 
+-    release = ctxt.p('new/iso/dists/stable/Release')
++    release = ctxt.p('new/iso/dists/jammy/Release')
+ 
+     run(['gpg', '--home', gpghome, '--detach-sign', '--armor', release])
+     os.rename(release + '.asc', release + '.gpg')
+@@ -369,7 +369,7 @@ def add_debs_to_pool(ctxt, debs: List[str] = ()):
+     for deb in debs:
+         shutil.copy(deb, pool)
+     arch = ctxt.get_arch()
+-    packages = ctxt.p(f'new/iso/dists/stable/main/binary-{arch}/Packages')
++    packages = ctxt.p(f'new/iso/dists/jammy/main/binary-{arch}/Packages')
+     cp = run(
+         [
+             'apt-ftparchive', '--md5=off', '--sha1=off',
+@@ -380,7 +380,7 @@ def add_debs_to_pool(ctxt, debs: List[str] = ()):
+         new_packages.write(cp.stdout)
+     with gzip.open(packages + '.gz', 'wb') as new_packages:
+         new_packages.write(cp.stdout)
+-    release = ctxt.p('new/iso/dists/stable/Release')
++    release = ctxt.p('new/iso/dists/jammy/Release')
+     with open(release) as o:
+         old = deb822.Deb822(o)
+     for p in release, release + '.gpg':
+@@ -388,7 +388,7 @@ def add_debs_to_pool(ctxt, debs: List[str] = ()):
+     cp = run(
+         [
+             'apt-ftparchive', '--md5=off', '--sha1=off', '--sha512=off',
+-            'release', 'dists/stable',
++            'release', 'dists/jammy',
+         ],
+         cwd=ctxt.p('new/iso'), stdout=subprocess.PIPE)
+     # The uncompressed Packages file has to be around when
