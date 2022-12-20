@@ -12,6 +12,8 @@ autoinstall:
     - arches:
       - default
       uri: http://ports.ubuntu.com/ubuntu-ports
+  packages:
+    - puppet-omnibus
   drivers:
     install: false
   identity:

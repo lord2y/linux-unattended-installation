@@ -12,6 +12,8 @@ autoinstall:
     - arches:
       - default
       uri: http://ports.ubuntu.com/ubuntu-ports
+  packages:
+    - puppet-omnibus
   drivers:
     install: false
   identity:
@@ -41,35 +43,30 @@ autoinstall:
   storage:
     config:
     - ptable: gpt
-      path: /dev/vda
       preserve: false
       name: ''
       grub_device: false
       type: disk
       id: disk-vda
     - ptable: gpt
-      path: /dev/vdb
       preserve: false
       name: ''
       grub_device: false
       type: disk
       id: disk-vdb
     - ptable: gpt
-      path: /dev/vdc
       preserve: false
       name: ''
       grub_device: false
       type: disk
       id: disk-vdc
     - ptable: gpt
-      path: /dev/vdd
       preserve: false
       name: ''
       grub_device: false
       type: disk
       id: disk-vdd
     - ptable: gpt
-      path: /dev/vde
       preserve: false
       name: ''
       grub_device: false
