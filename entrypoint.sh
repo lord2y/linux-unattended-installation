@@ -10,11 +10,18 @@ LIVEFS_EDITOR="${LIVEFS_EDITOR-$(readlink -f "$(dirname $(dirname ${0}))/livefs-
 LIVEFS_EDITOR=$(readlink -f $LIVEFS_EDITOR)
 echo $LIVEFS_EDITOR
 
+add_livefs_opts () {
+	LIVEFS_OPTS="${LIVEFS_OPTS+$LIVEFS_OPTS }$@"
+}
+
 _ISO="jammy-live-server-amd64.iso"
 _SOURCE_ISO_URL="https://cdimage.ubuntu.com/ubuntu-server/jammy/daily-live/current/$_ISO"
 _SOURCE="source-files"
 _OUTPUT="/output"
+_TMP_ISO="$_OUTPUT"/ubuntu-22.04-autoinstall-tmp.iso
+_ISO_NAME="$_OUTPUT"/ubuntu-22.04-autoinstall.iso
 _PROFILES=(bastion dhcp vpn)
+_DEB_DIR="/deb"
 
 # Create the DIR source-files
 mkdir -p "$_SOURCE"/{bastion,dhcp,vpn}
@@ -40,7 +47,7 @@ done
 cd "$_SOURCE"
 "$BIN_XORRISO" -as mkisofs -r \
   -V 'Ubuntu 22.04 LTS AUTO (EFIBIOS)' \
-  -o $_OUTPUT/ubuntu-22.04-autoinstall-tmp.iso \
+  -o $_TMP_ISO \
   --grub2-mbr ../BOOT/1-Boot-NoEmul.img \
   -partition_offset 16 \
   --mbr-force-bootable \
@@ -54,10 +61,18 @@ cd "$_SOURCE"
   -e '--interval:appended_partition_2:::' \
   -no-emul-boot \
   .
-
-#cp -v ../ubuntu-22.04-autoinstall.iso  $_OUTPUT/ubuntu-22.04-autoinstall.iso
-mount -t tmpfs tmpfs /tmp
-cd "$LIVEFS_EDITOR"
-git apply /patch/livefs.patch
-cd /
-PYTHONPATH=$LIVEFS_EDITOR python3 -m livefs_edit $_OUTPUT/ubuntu-22.04-autoinstall-tmp.iso $_OUTPUT/ubuntu-22.04-autoinstall.iso --add-debs-to-pool $_OUTPUT/puppet-omnibus_3.8.5-exo4_amd64.deb 
+ 
+if [ "$(ls -A $_DEB_DIR)" ]; then
+	mount -t tmpfs tmpfs /tmp
+	cd "$LIVEFS_EDITOR"
+	git apply /patch/livefs.patch
+	for file in $(ls -1 $_DEB_DIR);
+	do
+		add_livefs_opts --add-debs-to-pool "$_DEB_DIR"/"$file"
+	done
+	echo "PYTHONPATH=$LIVEFS_EDITOR python3 -m livefs_edit $_TMP_ISO $_ISO_NAME $LIVEFS_OPTS"
+	PYTHONPATH=$LIVEFS_EDITOR python3 -m livefs_edit $_TMP_ISO $_ISO_NAME $LIVEFS_OPTS
+	rm $_TMP_ISO
+else
+	mv $_TMP_ISO $_ISO_NAME
+fi
