@@ -64,8 +64,7 @@ cd "$_SOURCE"
  
 if [ "$(ls -A $_DEB_DIR)" ]; then
 	mount -t tmpfs tmpfs /tmp
-	cd "$LIVEFS_EDITOR"
-	git apply /patch/livefs.patch
+	patch "$LIVEFS_EDITOR"/livefs_edit/actions.py < /patch/livefs.patch
 	for file in $(ls -1 $_DEB_DIR);
 	do
 		add_livefs_opts --add-debs-to-pool "$_DEB_DIR"/"$file"
