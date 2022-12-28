@@ -5,7 +5,7 @@
 : "${BIN_7Z:=$(type -P 7z)}"
 
 LIVEFS_EDITOR="${LIVEFS_EDITOR-$(readlink -f "$(dirname $(dirname ${0}))/livefs-editor")}"
-[ -d $LIVEFS_EDITOR ] || git clone https://github.com/mwhudson/livefs-editor $LIVEFS_EDITOR
+[ -d $LIVEFS_EDITOR ] || git clone https://github.com/lord2y/livefs-editor $LIVEFS_EDITOR
 
 LIVEFS_EDITOR=$(readlink -f $LIVEFS_EDITOR)
 echo $LIVEFS_EDITOR
@@ -20,11 +20,14 @@ _SOURCE="source-files"
 _OUTPUT="/output"
 _TMP_ISO="$_OUTPUT"/ubuntu-22.04-autoinstall-tmp.iso
 _ISO_NAME="$_OUTPUT"/ubuntu-22.04-autoinstall.iso
-_PROFILES=(bastion dhcp vpn)
+_PROFILES=(raid1 raid5)
 _DEB_DIR="/deb"
 
 # Create the DIR source-files
-mkdir -p "$_SOURCE"/{bastion,dhcp,vpn}
+for profile in "${_PROFILES[@]}";
+do
+	mkdir -p "$_SOURCE"/"$profile"
+done
 
 if [ ! -f "$_ISO" ];then
 	# Download the ISO
@@ -64,7 +67,6 @@ cd "$_SOURCE"
  
 if [ "$(ls -A $_DEB_DIR)" ]; then
 	mount -t tmpfs tmpfs /tmp
-	patch "$LIVEFS_EDITOR"/livefs_edit/actions.py < /patch/livefs.patch
 	for file in $(ls -1 $_DEB_DIR);
 	do
 		add_livefs_opts --add-debs-to-pool "$_DEB_DIR"/"$file"
