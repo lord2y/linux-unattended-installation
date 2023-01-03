@@ -51,7 +51,7 @@ At this point, we can run the following:
 		-v ${PWD}/output:/output  \
 		-v --privileged           \
 		-v /run/udev:/run/udev:ro \
-		-v ${PWD}/debs:/debs      \
+		-v ${PWD}/deb:/deb      \
 		cdrom:1.0
 
 The process will create the file `./output/ubuntu-22.04-autoinstall.iso`. This
